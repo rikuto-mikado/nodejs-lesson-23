@@ -1,0 +1,32 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title #{docTitle}
+        link(rel="stylesheet", href="/css/main.css")
+    body
+        header.main-header
+            nav.main-header__nav
+                ul.main-header__item-list
+                    li.main-header__item
+                        a.active(href="/") Shop
+                    li.main-header__item
+                        a(href="/admin/add-product") Add Product
+
+        main
+            if prods.length > 0
+                .grid
+                    each product in prods
+                        article.card.product-item
+                            header.card__header
+                                h1.product__title #{product.title}
+                            div.card__image
+                                img(src="https://media.istockphoto.com/id/1443209389/vector/books-doodle-drawings.jpg?s=612x612&w=0&k=20&c=u3HV_lYZ27t2Ud7YLpcnhLngv0M4atL3Gh_4kzTFkUE=", alt="A Book")
+                            div.card__content
+                                h2.product__price $19.99
+                                p.product__description A very interesting book about so many even more interesting things!
+                            .card__actions
+                                button.btn Add to Cart     
+            else
+                h1 No Products
