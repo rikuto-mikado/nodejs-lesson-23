@@ -13,5 +13,6 @@ html(lang="en")
                     li.main-header__item
                         a(href="/") Shop
                     li.main-header__item
-                        a(href="/admin/add-product") Add Product
+                        //- Applies 'active' class when path matches to highlight current page in navigation
+                        a(href="/admin/add-product", class=(path === '/admin/add-product' ? 'active' : '')) Add Product
         block content

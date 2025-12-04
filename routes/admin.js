@@ -9,7 +9,8 @@ const router = express.Router();
 const products = [];
 
 router.get('/add-product', (req, res, next) => {
-  res.render('add-product', {pageTitle: 'Add Product'});
+  // path is used to identify the active navigation link in the template
+  res.render('add-product', { pageTitle: 'Add Product', path: '/admin/add-product' });
 });
 
 router.post('/add-product', (req, res, next) => {
