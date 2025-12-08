@@ -9,7 +9,9 @@ const router = express.Router();
 
 router.get('/', (req, res, next) => {
   const products = adminData.products;
-  res.render('shop', {prods: products, pageTitle: 'Shop', path: '/'});
+  // Handlebars cannot directly evaluate array.length in conditionals ({{#if prds.length}})
+  // So we need to convert it to a boolean value and pass it explicitly
+  res.render('shop', {prods: products, pageTitle: 'Shop', path: '/', hasProducts: products.length > 0});
 });
 
 module.exports = router;

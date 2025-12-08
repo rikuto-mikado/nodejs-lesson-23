@@ -6,7 +6,9 @@ const expressHbs = require('express-handlebars');
 
 const app = express();
 
-app.engine('hbs', expressHbs());
+// Configure Handlebars with defaultLayout: false to disable automatic layout wrapping
+// Without this, express-handlebars will look for views/layouts/main.handlebars by default
+app.engine('hbs', expressHbs.engine({ defaultLayout: false }));
 app.set('view engine', 'hbs');
 app.set('views', 'views');
 

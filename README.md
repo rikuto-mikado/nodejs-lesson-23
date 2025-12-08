@@ -4,6 +4,30 @@
 
 This lesson explored different template engines for rendering dynamic HTML in Node.js/Express applications, focusing on **Handlebars** and comparing it with **Pug**.
 
+### Key Takeaways
+
+1. **Handlebars Block Helpers**:
+   - `{{#if}}`, `{{#each}}`, `{{ else }}` for conditional rendering and iteration
+   - Must close blocks with `{{/if}}` and `{{/each}}`
+
+2. **Context Access in Loops**:
+   - Inside `{{#each}}`, use `{{ this.property }}` to access current item properties
+   - Example: `{{#each prods}}` → `{{ this.title }}`
+
+3. **Array Length Limitation**:
+   - Handlebars cannot evaluate `products.length` in conditionals
+   - Must pass pre-computed boolean: `hasProducts: products.length > 0`
+   - See: `routes/shop.js:12-13`
+
+4. **Layout Configuration**:
+   - express-handlebars looks for `views/layouts/main.handlebars` by default
+   - Must explicitly disable with `defaultLayout: false` if not using layouts
+   - See: `app.js:11`
+
+5. **Template Engine Setup**:
+   - Modern express-handlebars (v6+) requires `.engine()` method
+   - Configure extension and layout settings during initialization
+
 ## Template Engines Comparison
 
 | Feature | Handlebars (.hbs) | Pug | EJS |
@@ -54,6 +78,60 @@ html(lang="en")
           li #{product.name} - $#{product.price}
     else
       p No products available
+```
+
+## Handlebars Core Syntax
+
+### Variables and Expressions
+```handlebars
+{{ pageTitle }}           <!-- Simple variable -->
+{{ this.title }}          <!-- Context property inside #each -->
+```
+
+### Block Helpers
+
+#### Conditionals
+```handlebars
+{{#if hasProducts}}
+  <p>Products available!</p>
+{{ else }}
+  <p>No products</p>
+{{/if}}
+```
+
+**Important**: Handlebars cannot evaluate `array.length` directly in conditionals. You must pass a pre-computed boolean:
+```javascript
+// Server-side
+res.render('shop', {
+  prods: products,
+  hasProducts: products.length > 0  // Convert to boolean
+});
+```
+
+#### Iteration
+```handlebars
+{{#each prods}}
+  <h2>{{ this.title }}</h2>        <!-- Access current item -->
+  <p>${{ this.price }}</p>
+{{/each}}
+```
+
+Inside `{{#each}}`, use `{{ this.property }}` to access properties of the current item.
+
+### Real Example from shop.hbs
+```handlebars
+{{#if hasProducts}}
+  <div class="grid">
+    {{#each prods}}
+      <article class="card product-item">
+        <h1 class="product__title">{{ this.title }}</h1>
+        <h2 class="product__price">${{ this.price }}</h2>
+      </article>
+    {{/each}}
+  </div>
+{{ else }}
+  <h1>No Products</h1>
+{{/if}}
 ```
 
 ## Setup in Express
@@ -136,21 +214,29 @@ Handlebars intentionally limits logic in templates. This means:
 
 This is **by design** to maintain clean separation between business logic and presentation.
 
-## Project Structure
+### 3. Handlebars Default Layout Behavior
+**Error**: `ENOENT: no such file or directory, open '.../views/layouts/main.handlebars'`
 
+**Problem**: express-handlebars **automatically looks for a layout file** by default, even when you don't want to use layouts.
+
+**Solution**: Explicitly disable layouts if you're using complete HTML in each template:
+```javascript
+app.engine('hbs', expressHbs.engine({ defaultLayout: false }));
 ```
-nodejs-lesson-23/
-├── app.js                 # Express server setup
-├── views/
-│   ├── 404.hbs           # Handlebars template
-│   ├── 404.pug           # Pug template (comparison)
-│   └── shop.pug          # Pug template with logic
-├── routes/
-│   ├── admin.js
-│   └── shop.js
-└── public/
-    └── css/
-        └── main.css
+
+**Q: Why does Handlebars need `hasProducts: products.length > 0` in render data?**
+
+**A**: Unlike Pug, Handlebars cannot directly evaluate `array.length` in conditionals. This won't work:
+```handlebars
+{{#if products.length}}  <!-- Doesn't work as expected -->
+```
+
+You must convert it to a boolean server-side and pass it explicitly:
+```javascript
+res.render('shop', {
+  products,
+  hasProducts: products.length > 0  // Pre-computed boolean
+});
 ```
 
 ## Conclusion
